@@ -49,6 +49,7 @@ module "worker" {
   env_vars = [
     { name = "OAUTH_AUDIENCE", value = local.audience },
     { name = "OAUTH_TENANT", value = var.OAUTH_TENANT },
+    { name = "HISTORY_URL", value = var.HISTORY_URL },
   ]
   databases = [
     { binding = "DB", id = module.database.id }
@@ -73,5 +74,6 @@ module "server" {
   identifier = local.audience
   scopes = {
     "read:movies" : "Read TMDB movies",
+    "read:history" : "Read history",
   }
 }

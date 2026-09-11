@@ -4,6 +4,7 @@ import { API, AuthBindings, authorize, AuthVariables } from "@okkema/worker/api"
 type Environment = {
   SENTRY_DSN: string
   TMDB_TOKEN: string
+  HISTORY_URL: string
   DEBUG: string
   REDIRECT: string
 } & AuthBindings
@@ -17,7 +18,8 @@ export default SentryWorker<Environment>({
     const app = API<Environment, Variables>({
       tokenUrl: `https://${env.OAUTH_TENANT}/oauth/token`,
       scopes: {
-        "read:movies": "Read TMDB movies"
+        "read:movies": "Read TMDB movies",
+        "read:history": "Read history"
       },
       options: {
         docs_url: null
@@ -35,6 +37,17 @@ export default SentryWorker<Environment>({
 
     app.get("/movie/*", authorize("read:movies"), handler)
     app.get("/search/movie", authorize("read:movies"), handler)
+
+    async function historyHandler(c) {
+      const url = new URL(c.req.url)
+      c.res = await fetch(`${env.HISTORY_URL}${url.pathname}${url.search}`, {
+        headers: {
+          "Authorization": c.req.header("Authorization")!
+        }
+      })
+    }
+
+    app.get("/history/*", authorize("read:history"), historyHandler)
     
     if (new URL(req.url).pathname === "/") 
       return new Response("Redirecting...", { 
