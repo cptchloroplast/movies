@@ -1,0 +1,31 @@
+name: Terraform
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build worker
+        run: npm run build
+
+      - name: Deploy Terraform
+        uses: okkema/actions/terraform@v2
+        with:
+          working-directory: terraform
+          upgrade: true
+          terraform-token: ${{ secrets.TF_API_TOKEN }}
