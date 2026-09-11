@@ -10,6 +10,7 @@ variable "D1_CLOUDFLARE_API_TOKEN" {
 variable "TMDB_TOKEN" {
   sensitive = true
 }
+variable "HISTORY_URL" {}
 variable "OAUTH_TENANT" {}
 
 # GitHub Actions Secrets
